@@ -1,6 +1,7 @@
 <html>
   <body>
     <h1>Simple Page</h1>
+	
       <script type="text/javascript" src="http://localhost:3000/socket.io/socket.io.js"></script>
       <script>
         var socket = io.connect('http://localhost:3000');
@@ -8,14 +9,19 @@
         if (document.addEventListener != null)
         { 
           document.addEventListener("mousemove", MoveFn, false);
-          document.addEventListener("click", clickFn, false);
-          document.addEventListener("scroll", scrollFn, false);
+          document.addEventListener("click",clickFn, false);
+          document.addEventListener("scroll",scrollFn, false);
+		  document.addEventListener("keydown",downFn, false);
+		  document.addEventListener("touchstart",touchFn, false);
+		  document.addEventListener("onfocus",focusFn, false);
+		  document.addEventListener("resize",sizeFn, false);
         }
         else
         { 
-          document.attachEvent("onmousemove", MoveFn);
+          document.attachEvent("onmousemove",MoveFn);
           document.attachEvent("onclick", clickFn);
           document.attachEvent("onscroll", scrollFn);
+		  document.attachEvent("keyup", downFn);
         }
          
         function MoveFn(e){
@@ -26,7 +32,54 @@
                                      y:e.clientY
                                     });
           }
+		  }
+		  function sizeFn(e){
+          if (socket){
+            e = window.event || e; 
+            socket.emit('size',{timestamp: Date.now(),
+                                     w: window.width,
+								     h: window.height,
+									  
+                                    });
+          }
+		  }
+		   function focusFn(e){
+          if (socket){
+            e = window.event || e; 
+            socket.emit('focus',{timestamp: Date.now(),
+                                    // x:e.clientX,
+                                     //y:e.clientY
+                                    });
+          }
+		  
+		  }
+		 
+		
+			
+			
+		 
+			
+		 
+		 function downFn(e){
+          if (socket){
+            e = window.event || e;
+            var x;
+            var y;
+            if (e.pageX || e.pageY) { 
+              x = e.pageX;
+              y = e.pageY;
+            }
+            else { 
+              x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+              y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+            }  
+            socket.emit('down',{timestamp: Date.now(),
+                                      x:x,
+                                      y:y
+                                     });
+          }
         }
+		
         function clickFn(e){
           if (socket){
             e = window.event || e;
